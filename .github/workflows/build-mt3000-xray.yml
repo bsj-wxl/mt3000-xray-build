@@ -32,10 +32,18 @@ jobs:
           mkdir -p sdk/package/luci-app-xray
           cp -r package_src/* sdk/package/luci-app-xray/
 
-      - name: Update feeds
+      - name: Fix broken feeds and update only required feeds
         run: |
           cd sdk
-          ./scripts/feeds update -a
+          echo "===== Original feeds.conf.default ====="
+          cat feeds.conf.default || true
+
+          sed -i '/mtk_openwrt_feed/s/^/# /' feeds.conf.default || true
+
+          echo "===== Fixed feeds.conf.default ====="
+          cat feeds.conf.default || true
+
+          ./scripts/feeds update -i
           ./scripts/feeds install -a
 
       - name: Prepare minimal config
